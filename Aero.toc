@@ -1,0 +1,5 @@
+## Interface: 11200
+## Title: Aero
+## Notes: Adds animations to frames.
+Aero.lua
+Frames.lua

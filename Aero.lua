@@ -46,7 +46,7 @@ Aero:SetScript("OnUpdate", OnUpdate)
 
 local function OnShow()
 	this.onshow()
-	if this.hiding or running[this] or UnitAffectingCombat"player" then return end
+	if this.hiding or running[this] then return end
 	tinsert(running, this)
 	this.aero.start = 0.5
 	this.aero.diff = 0.5
@@ -54,7 +54,7 @@ end
 
 local function OnHide()
 	this.onhide()
-	if this.hiding or running[this] or UnitAffectingCombat"player" then return end
+	if this.hiding or running[this] then return end
 	tinsert(running, this)
 	this.aero.start = 1
 	this.aero.diff = -0.5

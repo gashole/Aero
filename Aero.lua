@@ -1,27 +1,25 @@
-﻿local _G = getfenv(0)
+﻿local duration = 0.15
+
 local Aero = CreateFrame"Frame"
-local aero, percent, value
 local running = {}
 local next = next
+local _G = getfenv(0)
 
-local duration = 0.15
-
-local function print(msg)
-	DEFAULT_CHAT_FRAME:AddMessage(msg)
-end
+local function print(msg) DEFAULT_CHAT_FRAME:AddMessage(msg) end
 
 local function Anim(frame)
-	aero = frame.aero
-	percent = aero.total / duration
-	value = aero.start + aero.diff * percent
+	local aero = frame.aero
+	local percent = aero.total / duration
+	local value = aero.start + aero.diff * percent
 	if value <= 0 then value = 0.01 end
 	frame:SetAlpha(value)
 	frame:SetScale(value)
 end
 
 local function OnFinish(frame)
-	frame:SetScale(1)
-	frame:SetAlpha(1)
+	local aero = frame.aero
+	frame:SetScale(aero.scale)
+	frame:SetAlpha(aero.alpha)
 	if frame.onfinishhide then
 		frame.onfinishhide = nil
 		HideUIPanel(frame)
@@ -31,7 +29,7 @@ end
 
 local function OnUpdate()
 	for i, frame in next, running do
-		aero = frame.aero
+		local aero = frame.aero
 		aero.total = aero.total + arg1
 		if aero.total >= duration then
 			aero.total = 0
@@ -48,16 +46,20 @@ local function OnShow()
 	this.onshow()
 	if this.hiding or running[this] then return end
 	tinsert(running, this)
-	this.aero.start = 0.5
-	this.aero.diff = 0.5
+	local aero = this.aero
+	aero.scale = this:GetScale()
+	aero.alpha = this:GetAlpha()
+	aero.diff = 0.5
+	aero.start = aero.scale - aero.diff
 end
 
 local function OnHide()
 	this.onhide()
 	if this.hiding or running[this] then return end
 	tinsert(running, this)
-	this.aero.start = 1
-	this.aero.diff = -0.5
+	local aero = this.aero
+	aero.diff = -0.5
+	aero.start = aero.scale
 	this.onfinishhide = true
 	this.hiding = true
 	this:Show()

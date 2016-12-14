@@ -1,4 +1,4 @@
-﻿local duration = 0.15
+﻿local duration = 0.1
 
 local Aero = CreateFrame"Frame"
 local running = {}

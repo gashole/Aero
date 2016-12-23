@@ -1,9 +1,9 @@
-﻿local duration = 0.1
-
-local Aero = CreateFrame"Frame"
+﻿local Aero = CreateFrame"Frame"
 local running = {}
 local next = next
 local _G = getfenv(0)
+
+local duration = 0.1
 
 local function print(msg) DEFAULT_CHAT_FRAME:AddMessage(msg) end
 
@@ -43,26 +43,38 @@ end
 Aero:SetScript("OnUpdate", OnUpdate)
 
 local function OnShow()
-	this.onshow()
-	if this.hiding or running[this] then return end
-	tinsert(running, this)
-	local aero = this.aero
-	aero.scale = this:GetScale()
-	aero.alpha = this:GetAlpha()
-	aero.diff = 0.5
-	aero.start = aero.scale - aero.diff
+	local frame = this:GetParent()
+	if frame.hiding or running[frame] then return end
+	tinsert(running, frame)
+	if not frame.onshow then
+		frame.onshow = frame:GetScript("OnShow") or function() end
+		frame:SetScript("OnShow", function()
+			frame.onshow()
+			local aero = frame.aero
+			aero.scale = frame:GetScale()
+			aero.alpha = frame:GetAlpha()
+			aero.diff = 0.5
+			aero.start = aero.scale - aero.diff
+		end)
+	end
 end
 
 local function OnHide()
-	this.onhide()
-	if this.hiding or running[this] then return end
-	tinsert(running, this)
-	local aero = this.aero
-	aero.diff = -0.5
-	aero.start = aero.scale
-	this.onfinishhide = true
-	this.hiding = true
-	this:Show()
+	local frame = this:GetParent()
+	if frame.hiding or running[frame] then return end
+	tinsert(running, frame)
+	if not frame.onhide then
+		frame.onhide = frame:GetScript("OnHide") or function() end
+		frame:SetScript("OnHide", function()
+			frame.onhide()
+			local aero = frame.aero
+			aero.start = aero.scale
+			aero.diff = -0.5
+		end)
+	end
+	frame.onfinishhide = true
+	frame.hiding = true
+	frame:Show()
 end
 
 function Aero:RegisterFrames(...)
@@ -73,10 +85,9 @@ function Aero:RegisterFrames(...)
 			if not frame then return print("Aero:|cff98F5FF "..arg.."|r not found.") end
 			frame.aero = frame.aero or {}
 			frame.aero.total = 0
-			frame.onshow = frame:GetScript("OnShow") or function() end
-			frame.onhide = frame:GetScript("OnHide") or function() end
-			frame:SetScript("OnShow", OnShow)
-			frame:SetScript("OnHide", OnHide)
+			local hook = CreateFrame("Frame", nil, frame)
+			hook:SetScript("OnShow", OnShow)
+			hook:SetScript("OnHide", OnHide)
 		else
 			arg()
 		end

@@ -49,12 +49,23 @@ function ToggleSpellBook(bookType)
 end
 
 Aero:RegisterFrames"WorldMapFrame"
+BlackoutWorld:SetAllPoints(WorldMapFrame)
+WorldMapFrameAreaLabel:SetText("") -- remove "BLAH!" text
+local f = CreateFrame("Frame", nil, WorldMapFrame)
+f:SetAllPoints(WorldMapButton)
+f:SetScript("OnShow", function() WorldMapButton:Hide() end)
+f:SetScript("OnUpdate", function()
+	if this:GetCenter() then
+		WorldMapButton:Show()
+	else
+		WorldMapButton:Hide()
+	end
+end)
 orig.WorldMapButton_OnUpdate = WorldMapButton_OnUpdate
 function WorldMapButton_OnUpdate(elapsed)
-	if not this:GetCenter() then return end
+	if not this:GetCenter() then return WorldMapButton:Hide() end
 	orig.WorldMapButton_OnUpdate(elapsed)
 end
-BlackoutWorld:SetAllPoints(WorldMapFrame)
 
 --[[
 Aero:RegisterAddon(addon, ...)

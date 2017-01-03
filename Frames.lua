@@ -33,7 +33,7 @@ Aero:RegisterFrames(
 
 local orig = {}
 
-Aero:RegisterFrames"SpellBookFrame"
+Aero:RegisterFrames("SpellBookFrame")
 orig.ToggleSpellBook = ToggleSpellBook
 function ToggleSpellBook(bookType)
 	local bt = SpellBookFrame.bookType
@@ -48,7 +48,7 @@ function ToggleSpellBook(bookType)
 	end
 end
 
-Aero:RegisterFrames"WorldMapFrame"
+Aero:RegisterFrames("WorldMapFrame")
 BlackoutWorld:SetAllPoints(WorldMapFrame)
 WorldMapFrameAreaLabel:SetText("") -- remove "BLAH!" text
 local f = CreateFrame("Frame", nil, WorldMapFrame)
@@ -63,7 +63,7 @@ f:SetScript("OnUpdate", function()
 end)
 orig.WorldMapButton_OnUpdate = WorldMapButton_OnUpdate
 function WorldMapButton_OnUpdate(elapsed)
-	if not this:GetCenter() then return WorldMapButton:Hide() end
+	if not this:GetCenter() then return this:Hide() end
 	orig.WorldMapButton_OnUpdate(elapsed)
 end
 

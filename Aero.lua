@@ -1,9 +1,11 @@
-﻿local Aero = CreateFrame"Frame"
+﻿local Aero = CreateFrame("Frame")
 local running = {}
 local next = next
 local _G = getfenv(0)
 
 local duration = 0.1
+
+local dummy = function() end
 
 local function print(msg) DEFAULT_CHAT_FRAME:AddMessage(msg) end
 
@@ -47,7 +49,7 @@ local function OnShow()
 	if frame.hiding or running[frame] then return end
 	tinsert(running, frame)
 	if not frame.onshow then
-		frame.onshow = frame:GetScript("OnShow") or function() end
+		frame.onshow = frame:GetScript("OnShow") or dummy
 		frame:SetScript("OnShow", function()
 			frame.onshow()
 			local aero = frame.aero
@@ -64,7 +66,7 @@ local function OnHide()
 	if frame.hiding or running[frame] then return end
 	tinsert(running, frame)
 	if not frame.onhide then
-		frame.onhide = frame:GetScript("OnHide") or function() end
+		frame.onhide = frame:GetScript("OnHide") or dummy
 		frame:SetScript("OnHide", function()
 			frame.onhide()
 			local aero = frame.aero
@@ -101,7 +103,7 @@ local function OnEvent()
 		addons[arg1] = nil
 	end
 end
-Aero:RegisterEvent"ADDON_LOADED"
+Aero:RegisterEvent("ADDON_LOADED")
 Aero:SetScript("OnEvent", OnEvent)
 
 function Aero:RegisterAddon(addon, ...)

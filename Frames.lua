@@ -16,7 +16,6 @@ Aero:RegisterFrames(
 	"ColorPickerFrame",
 	"GuildInfoFrame",
 	"ReputationDetailFrame",
-	"LootFrame",
 	"HelpFrame",
 	"MailFrame",
 	"TradeFrame",

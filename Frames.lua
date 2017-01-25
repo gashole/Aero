@@ -31,14 +31,12 @@ Aero:RegisterFrames(
 	"BankFrame"
 )
 
-local orig = {}
-
 Aero:RegisterFrames("SpellBookFrame")
-orig.ToggleSpellBook = ToggleSpellBook
+local origToggleSpellBook = ToggleSpellBook
 function ToggleSpellBook(bookType)
 	local bt = SpellBookFrame.bookType
 	if not this then this = SpellBookFrame end
-	orig.ToggleSpellBook(bookType)
+	origToggleSpellBook(bookType)
 	if SpellBookFrame.hiding and bt ~= SpellBookFrame.bookType then
 		HideUIPanel(SpellBookFrame)
 		ShowUIPanel(SpellBookFrame)
@@ -61,10 +59,10 @@ f:SetScript("OnUpdate", function()
 		WorldMapButton:Hide()
 	end
 end)
-orig.WorldMapButton_OnUpdate = WorldMapButton_OnUpdate
+local origWorldMapButton_OnUpdate = WorldMapButton_OnUpdate
 function WorldMapButton_OnUpdate(elapsed)
 	if not this:GetCenter() then return this:Hide() end
-	orig.WorldMapButton_OnUpdate(elapsed)
+	origWorldMapButton_OnUpdate(elapsed)
 end
 
 --[[

@@ -2,12 +2,13 @@
 local running = {}
 local next = next
 local _G = getfenv(0)
+local dummy = function() end
 
 local duration = 0.1
 
-local dummy = function() end
-
-local function print(msg) DEFAULT_CHAT_FRAME:AddMessage(msg) end
+local function print(msg)
+	DEFAULT_CHAT_FRAME:AddMessage(msg)
+end
 
 local function Anim(frame)
 	local aero = frame.aero

@@ -1,5 +1,7 @@
 ## Interface: 11200
 ## Title: Aero
 ## Notes: Adds animations to frames.
+## Version: 2.0
+## SavedVariables: AeroDB
 Aero.lua
 Frames.lua

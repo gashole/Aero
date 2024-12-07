@@ -57,9 +57,7 @@ local function delayHideOnEvent(frame, eventName, delay)
             frame.aero.delayEvent = false
             delayRun(delay, function()
                 if not frame.aero.delayEvent then
-                    if origOnEvent then
-                        origOnEvent()
-                    end
+                    if origOnEvent then origOnEvent() end
                     HideUIPanel(frame)
                 end
             end)
@@ -91,7 +89,6 @@ function ToggleSpellBook(bookType)
         SpellBookFrame_Update(1)
         return
     end
-
     origToggleSpellBook(bookType)
 end
 
@@ -142,7 +139,6 @@ function ToggleBag(id)
     if frame and frame:IsShown() and frame.aero.animating then
         frame.aero.animating = false
     end
-
     origToggleBag(id)
 end
 
@@ -192,11 +188,9 @@ local origWorldMapFrame_Minimize = WorldMapFrame_Minimize
 function WorldMapFrame_Minimize()
     WorldMapContinentDropDown:Hide()
     WorldMapZoneDropDown:Hide()
-    WorldMapFrame.aero = WorldMapFrame.aero or {}
     WorldMapFrame.aero.animating = true
     origWorldMapFrame_Minimize()
     WorldMapFrame.aero.animating = false
-    --moveFrame(WorldMapFrame, "TOP", 11, -118)
 end
 
 local origWorldMapFrame_Maximize = WorldMapFrame_Maximize
@@ -204,7 +198,6 @@ function WorldMapFrame_Maximize()
     if not WorldMapFrame:IsVisible() then return end
     WorldMapContinentDropDown:Show()
     WorldMapZoneDropDown:Show()
-    WorldMapFrame.aero = WorldMapFrame.aero or {}
     WorldMapFrame.aero.animating = true
     origWorldMapFrame_Maximize()
     WorldMapFrame.aero.animating = false
@@ -235,6 +228,7 @@ Aero:RegisterAddon("TimeManager", "TimeManagerFrame")
 
 -- ShaguTweaks
 Aero:RegisterAddon("ShaguTweaks", "AdvancedSettingsGUI")
+
 local shaguTweaks = CreateFrame("Frame")
 shaguTweaks:RegisterEvent("PLAYER_ENTERING_WORLD")
 shaguTweaks:SetScript("OnEvent", function()
@@ -244,9 +238,10 @@ shaguTweaks:SetScript("OnEvent", function()
             delayRun(0, function()
                 WorldMapFrame:SetWidth(720)
                 WorldMapFrame:SetHeight(521)
-                --moveFrame(WorldMapFrame, "TOP", 11, -118)
             end)
         end
+
+        delayRun(0, function() WorldMapFrame.aero.origScale = WorldMapFrame:GetScale() end)
 
         shaguTweaks:UnregisterEvent("PLAYER_ENTERING_WORLD")
         shaguTweaks:SetScript("OnEvent", nil)

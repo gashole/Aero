@@ -188,6 +188,7 @@ local origWorldMapFrame_Minimize = WorldMapFrame_Minimize
 function WorldMapFrame_Minimize()
     WorldMapContinentDropDown:Hide()
     WorldMapZoneDropDown:Hide()
+    WorldMapFrame.aero = WorldMapFrame.aero or {}
     WorldMapFrame.aero.animating = true
     origWorldMapFrame_Minimize()
     WorldMapFrame.aero.animating = false
@@ -198,6 +199,7 @@ function WorldMapFrame_Maximize()
     if not WorldMapFrame:IsVisible() then return end
     WorldMapContinentDropDown:Show()
     WorldMapZoneDropDown:Show()
+    WorldMapFrame.aero = WorldMapFrame.aero or {}
     WorldMapFrame.aero.animating = true
     origWorldMapFrame_Maximize()
     WorldMapFrame.aero.animating = false

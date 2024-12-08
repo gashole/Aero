@@ -229,21 +229,39 @@ Aero:RegisterAddon("TimeManager", "TimeManagerFrame")
 -- ShaguTweaks
 Aero:RegisterAddon("ShaguTweaks", "AdvancedSettingsGUI")
 
-local shaguTweaks = CreateFrame("Frame")
-shaguTweaks:RegisterEvent("PLAYER_ENTERING_WORLD")
-shaguTweaks:SetScript("OnEvent", function()
+local addons = CreateFrame("Frame")
+addons:RegisterEvent("PLAYER_ENTERING_WORLD")
+addons:SetScript("OnEvent", function()
     if IsAddOnLoaded("ShaguTweaks") then
-        if WORLDMAP_WINDOWED == 1 and ShaguTweaks_config[ShaguTweaks.T["WorldMap Window"]] == 1 then
-            WorldMapFrame_Minimize()
+        if ShaguTweaks_config[ShaguTweaks.T["WorldMap Window"]] == 1 then
+            if WORLDMAP_WINDOWED == 1 then
+                WorldMapFrame_Minimize()
+                delayRun(0, function()
+                    WorldMapFrame:SetWidth(720)
+                    WorldMapFrame:SetHeight(521)
+                end)
+            end
+
             delayRun(0, function()
-                WorldMapFrame:SetWidth(720)
-                WorldMapFrame:SetHeight(521)
+                WorldMapFrame.aero.origScale = WorldMapFrame:GetScale()
             end)
         end
-
-        delayRun(0, function() WorldMapFrame.aero.origScale = WorldMapFrame:GetScale() end)
-
-        shaguTweaks:UnregisterEvent("PLAYER_ENTERING_WORLD")
-        shaguTweaks:SetScript("OnEvent", nil)
     end
+
+    -- pfUI
+    if IsAddOnLoaded("pfUI") then
+        Aero:RegisterAddon("pfUI", "pfConfigGUI", "pfAddons")
+
+        for _, frame in pairs({pfUI.unlock, pfUI.hoverbind}) do
+            local origOnShow = frame:GetScript("OnShow")
+            frame:SetScript("OnShow", function()
+                pfConfigGUI.aero.animating = true
+                if origOnShow then origOnShow() end
+                pfConfigGUI.aero.animating = false
+            end)
+        end
+    end
+
+    addons:UnregisterEvent("PLAYER_ENTERING_WORLD")
+    addons:SetScript("OnEvent", nil)
 end)

@@ -67,8 +67,8 @@ Aero:SetScript("OnUpdate", function()
             scale = scale <= 0 and 0.01 or scale
 
             local scalePct = scale / aero.origScale
-            local alpha = scalePct <= 0.1 and 0
-                or (scalePct <= 0.8 and ((scalePct - 0.1) / 0.7) * 0.2
+            local alpha = scalePct <= 0.2 and 0
+                or (scalePct <= 0.8 and ((scalePct - 0.2) / 0.6) * 0.2
                 or (scalePct <= 1 and (0.2 + ((scalePct - 0.8) / 0.2) * 0.8)))
 
             frame:SetAlpha(math.max(0, math.min(1, alpha)))
@@ -83,7 +83,7 @@ local function onShow(frame)
     aero.animating = true
 
     tinsert(activeFrames, frame)
-    aero.scaleDiff = 1
+    aero.scaleDiff = 0.9
     aero.startScale = aero.origScale - aero.scaleDiff
 end
 Aero:SetScript("OnShow", onShow)
@@ -96,7 +96,7 @@ local function onHide(frame)
     tinsert(activeFrames, frame)
 
     aero.startScale = aero.origScale
-    aero.scaleDiff = -1
+    aero.scaleDiff = -0.9
     aero.finished = true
     frame:Show()
 end

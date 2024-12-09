@@ -1,4 +1,4 @@
-![Aero](https://i.imgur.com/piul3GK.gif)
+![Aero](https://i.imgur.com/gE1cje2.gif)
 
 # Aero
 

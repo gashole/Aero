@@ -40,8 +40,10 @@ end
 local function delayRun(delay, callback)
     local elapsed = 0
     local frame = CreateFrame("Frame")
+
     frame:SetScript("OnUpdate", function()
         elapsed = elapsed + arg1
+
         if elapsed >= delay then
             callback()
             frame:SetScript("OnUpdate", nil)
@@ -52,9 +54,11 @@ end
 local function delayHideOnEvent(frame, eventName, delay)
     delay = delay or 0
     local origOnEvent = frame:GetScript("OnEvent")
+
     frame:SetScript("OnEvent", function()
         if event == eventName then
             frame.aero.delayEvent = false
+
             delayRun(delay, function()
                 if not frame.aero.delayEvent then
                     if origOnEvent then origOnEvent() end
@@ -84,11 +88,13 @@ Aero:RegisterFrames("SpellBookFrame")
 local origToggleSpellBook = ToggleSpellBook
 function ToggleSpellBook(bookType)
     this = this or SpellBookFrame
+
     if SpellBookFrame:IsVisible() and SpellBookFrame.bookType ~= bookType then
         SpellBookFrame.bookType = bookType
         SpellBookFrame_Update(1)
         return
     end
+
     origToggleSpellBook(bookType)
 end
 
@@ -112,8 +118,12 @@ function OpenAllBags(forceOpen)
         local frame = _G["ContainerFrame" .. i]
         local button = _G["CharacterBag" .. (i - 1) .. "Slot"]
 
-        if i <= NUM_BAG_FRAMES and GetContainerNumSlots(button:GetID() - _G["CharacterBag0Slot"]:GetID() + 1) > 0 then
-            totalBags = totalBags + 1
+        if button then
+            local bagID = button:GetID() - _G["CharacterBag0Slot"]:GetID() + 1
+
+            if i <= NUM_BAG_FRAMES and GetContainerNumSlots(bagID) > 0 then
+                totalBags = totalBags + 1
+            end
         end
 
         if frame:IsShown() then
@@ -136,9 +146,11 @@ end
 local origToggleBag = ToggleBag
 function ToggleBag(id)
     local frame = _G["ContainerFrame" .. id]
+
     if frame and frame:IsShown() and frame.aero.animating then
         frame.aero.animating = false
     end
+
     origToggleBag(id)
 end
 
@@ -146,6 +158,7 @@ local origContainerFrameItemButton_OnEnter = ContainerFrameItemButton_OnEnter
 function ContainerFrameItemButton_OnEnter(button)
     button = button or this
     if not button:GetRight() then return end
+
     origContainerFrameItemButton_OnEnter(button)
 end
 
@@ -155,6 +168,7 @@ mapFrame:SetAllPoints(WorldMapFrame)
 mapFrame:RegisterEvent("PLAYER_ENTERING_WORLD")
 mapFrame:SetScript("OnEvent", function()
     Aero:RegisterFrames("WorldMapFrame")
+
     if WORLDMAP_WINDOWED == 0 then
         moveFrame(WorldMapFrameTitle, "CENTER", 0, 372)
     end
@@ -175,6 +189,7 @@ end)
 origWorldMapButton_OnUpdate = WorldMapButton_OnUpdate
 function WorldMapButton_OnUpdate(elapsed)
     if not this:GetCenter() then return end
+
     origWorldMapButton_OnUpdate(elapsed)
 end
 
@@ -188,6 +203,7 @@ local origWorldMapFrame_Minimize = WorldMapFrame_Minimize
 function WorldMapFrame_Minimize()
     WorldMapContinentDropDown:Hide()
     WorldMapZoneDropDown:Hide()
+
     WorldMapFrame.aero = WorldMapFrame.aero or {}
     WorldMapFrame.aero.animating = true
     origWorldMapFrame_Minimize()
@@ -197,12 +213,15 @@ end
 local origWorldMapFrame_Maximize = WorldMapFrame_Maximize
 function WorldMapFrame_Maximize()
     if not WorldMapFrame:IsVisible() then return end
+
     WorldMapContinentDropDown:Show()
     WorldMapZoneDropDown:Show()
+
     WorldMapFrame.aero = WorldMapFrame.aero or {}
     WorldMapFrame.aero.animating = true
     origWorldMapFrame_Maximize()
     WorldMapFrame.aero.animating = false
+
     moveFrame(WorldMapFrameTitle, "CENTER", 0, 372)
 end
 
@@ -210,8 +229,8 @@ end
 Aero:RegisterAddon(addon, ...)
 Use it to register frames that are created after addon loaded or on demand
 Arguments:
-	addon - addon's name
-	... - either frame names or hook functions, separated by commas
+    addon - addon's name
+    ... - either frame names or hook functions, separated by commas
 ]]
 
 Aero:RegisterAddon("Blizzard_CraftUI", "CraftFrame")

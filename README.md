@@ -9,7 +9,7 @@ Credit: http://www.wowinterface.com/downloads/info17946-Aero.html
 ## Slash commands
 
 /aero  
-/aero <seconds> - Set the animation duration
+/aero `<seconds>` - Set the animation duration
 
 ## Install
 

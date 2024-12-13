@@ -1,4 +1,4 @@
-﻿local _G = getfenv()
+local _G = getfenv()
 
 --[[
 Aero:RegisterFrames(...)

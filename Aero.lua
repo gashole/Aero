@@ -1,11 +1,9 @@
-﻿local _G = getfenv()
+local _G = getfenv()
 
 local Aero = CreateFrame("Frame")
-AeroDB = AeroDB or {}
 
 local defaultDuration = 0.2
-AeroDB.duration = AeroDB.duration or defaultDuration
-local duration = AeroDB.duration
+local duration = defaultDuration
 
 local animating = {}
 local addons = {}
@@ -14,19 +12,23 @@ local function print(msg)
     DEFAULT_CHAT_FRAME:AddMessage(msg)
 end
 
+Aero:RegisterEvent("VARIABLES_LOADED")
 Aero:RegisterEvent("ADDON_LOADED")
 Aero:SetScript("OnEvent", function()
-    if arg1 == "Aero" then
+    if event == "VARIABLES_LOADED" then
+        AeroDB = AeroDB or { duration = defaultDuration }
         duration = AeroDB.duration
-    elseif addons[arg1] then
-        Aero:RegisterFrames(unpack(addons[arg1]))
-        addons[arg1] = nil
+    elseif event == "ADDON_LOADED" then
+        if addons[arg1] then
+            Aero:RegisterFrames(unpack(addons[arg1]))
+            addons[arg1] = nil
+        end
     end
 end)
 
 local function onShow(frame)
     local aero = frame.aero
-    if aero.animating then return end
+    if aero.animating or StaticPopup1:IsShown() then return end
     aero.animating = true
 
     tinsert(animating, frame)
@@ -38,9 +40,7 @@ Aero:SetScript("OnShow", onShow)
 
 local function onHide(frame)
     local aero = frame.aero
-    if aero.animating or StaticPopup1:IsShown() then
-        return
-    end
+    if aero.animating or StaticPopup1:IsShown() then return end
     aero.animating = true
 
     tinsert(animating, frame)
@@ -77,7 +77,7 @@ Aero:SetScript("OnUpdate", function()
             scale = scale <= 0 and 0.01 or scale
 
             local scalePct = scale / aero.origScale
-            local alpha = (scalePct <= 0.3) and 0 or math.min(1, ((scalePct - 0.3) / 0.7)^4)
+            local alpha = (scalePct <= 0.3) and 0 or math.min(1, ((scalePct - 0.3) / 0.7) ^ 4)
 
             frame:SetAlpha(alpha)
             frame:SetScale(scale)
@@ -117,16 +117,12 @@ end
 
 function Aero:RegisterAddon(addon, ...)
     if IsAddOnLoaded(addon) then
-        for i = 1, arg.n do
-            Aero:RegisterFrames(arg[i])
-        end
+        for i = 1, arg.n do Aero:RegisterFrames(arg[i]) end
     else
         local _, _, _, enabled = GetAddOnInfo(addon)
         if enabled then
             addons[addon] = {}
-            for i = 1, arg.n do
-                tinsert(addons[addon], arg[i])
-            end
+            for i = 1, arg.n do tinsert(addons[addon], arg[i]) end
         end
     end
 end
@@ -141,8 +137,8 @@ function Aero:SetDuration(newDuration)
 end
 
 SLASH_AERO1 = "/aero"
-SlashCmdList["AERO"] = function(input)
-    local newDuration = tonumber(input)
+SlashCmdList["AERO"] = function(msg)
+    local newDuration = tonumber(msg)
 
     if Aero:SetDuration(newDuration) then
         local secondText = (newDuration == 1) and "second" or "seconds"

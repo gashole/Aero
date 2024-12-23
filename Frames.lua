@@ -104,9 +104,7 @@ for i = 1, NUM_CONTAINER_FRAMES do
 end
 
 local origUpdateContainerFrameAnchors = updateContainerFrameAnchors
-function updateContainerFrameAnchors()
-    delayRun(0, origUpdateContainerFrameAnchors)
-end
+function updateContainerFrameAnchors() delayRun(0, origUpdateContainerFrameAnchors) end
 
 local origOpenAllBags = OpenAllBags
 function OpenAllBags(forceOpen)
@@ -121,16 +119,12 @@ function OpenAllBags(forceOpen)
         if button then
             local bagID = button:GetID() - _G["CharacterBag0Slot"]:GetID() + 1
 
-            if i <= NUM_BAG_FRAMES and GetContainerNumSlots(bagID) > 0 then
-                totalBags = totalBags + 1
-            end
+            if i <= NUM_BAG_FRAMES and GetContainerNumSlots(bagID) > 0 then totalBags = totalBags + 1 end
         end
 
         if frame:IsShown() then
             frame.aero.animating = true
-            if frame:GetID() ~= KEYRING_CONTAINER then
-                bagsOpen = bagsOpen + 1
-            end
+            if frame:GetID() ~= KEYRING_CONTAINER then bagsOpen = bagsOpen + 1 end
         end
     end
 
@@ -147,9 +141,7 @@ local origToggleBag = ToggleBag
 function ToggleBag(id)
     local frame = _G["ContainerFrame" .. id]
 
-    if frame and frame:IsShown() and frame.aero.animating then
-        frame.aero.animating = false
-    end
+    if frame and frame:IsShown() and frame.aero.animating then frame.aero.animating = false end
 
     origToggleBag(id)
 end
@@ -169,24 +161,10 @@ mapFrame:RegisterEvent("PLAYER_ENTERING_WORLD")
 mapFrame:SetScript("OnEvent", function()
     Aero:RegisterFrames("WorldMapFrame")
 
-    if WORLDMAP_WINDOWED == 0 then
-        moveFrame(WorldMapFrameTitle, "CENTER", 0, 372)
-    end
+    if WORLDMAP_WINDOWED == 0 then moveFrame(WorldMapFrameTitle, "CENTER", 0, 372) end
 end)
 
-mapFrame:SetScript("OnShow", function()
-    WorldMapButton:Hide()
-end)
-
-mapFrame:SetScript("OnUpdate", function()
-    if mapFrame:GetCenter() then
-        WorldMapButton:Show()
-    else
-        WorldMapButton:Hide()
-    end
-end)
-
-origWorldMapButton_OnUpdate = WorldMapButton_OnUpdate
+local origWorldMapButton_OnUpdate = WorldMapButton_OnUpdate
 function WorldMapButton_OnUpdate(elapsed)
     if not this:GetCenter() then return end
 
@@ -263,9 +241,7 @@ addons:SetScript("OnEvent", function()
                 end)
             end
 
-            delayRun(0, function()
-                WorldMapFrame.aero.origScale = WorldMapFrame:GetScale()
-            end)
+            delayRun(0, function() WorldMapFrame.aero.origScale = WorldMapFrame:GetScale() end)
         end
     end
 
@@ -273,7 +249,7 @@ addons:SetScript("OnEvent", function()
     if IsAddOnLoaded("pfUI") then
         Aero:RegisterAddon("pfUI", "pfConfigGUI", "pfAddons")
 
-        for _, frame in pairs({pfUI.unlock, pfUI.hoverbind}) do
+        for _, frame in pairs({ pfUI.unlock, pfUI.hoverbind }) do
             local origOnShow = frame:GetScript("OnShow")
             frame:SetScript("OnShow", function()
                 pfConfigGUI.aero.animating = true

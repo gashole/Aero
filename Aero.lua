@@ -8,15 +8,14 @@ local duration = defaultDuration
 local animating = {}
 local addons = {}
 
-local function print(msg)
-    DEFAULT_CHAT_FRAME:AddMessage(msg)
-end
+local function print(msg) DEFAULT_CHAT_FRAME:AddMessage(msg) end
 
 Aero:RegisterEvent("VARIABLES_LOADED")
 Aero:RegisterEvent("ADDON_LOADED")
 Aero:SetScript("OnEvent", function()
     if event == "VARIABLES_LOADED" then
-        AeroDB = AeroDB or { duration = defaultDuration }
+        AeroDB = AeroDB or {}
+        AeroDB.duration = AeroDB.duration or defaultDuration
         duration = AeroDB.duration
     elseif event == "ADDON_LOADED" then
         if addons[arg1] then
@@ -117,12 +116,16 @@ end
 
 function Aero:RegisterAddon(addon, ...)
     if IsAddOnLoaded(addon) then
-        for i = 1, arg.n do Aero:RegisterFrames(arg[i]) end
+        for i = 1, arg.n do
+            Aero:RegisterFrames(arg[i])
+        end
     else
         local _, _, _, enabled = GetAddOnInfo(addon)
         if enabled then
             addons[addon] = {}
-            for i = 1, arg.n do tinsert(addons[addon], arg[i]) end
+            for i = 1, arg.n do
+                tinsert(addons[addon], arg[i])
+            end
         end
     end
 end

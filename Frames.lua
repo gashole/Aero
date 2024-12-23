@@ -225,27 +225,36 @@ Aero:RegisterAddon("Blizzard_BattlefieldMinimap", "BattlefieldMinimap")
 Aero:RegisterAddon("Blizzard_ItemSocketingUI", "ItemSocketingFrame")
 Aero:RegisterAddon("TimeManager", "TimeManagerFrame")
 
--- ShaguTweaks
+-- ShaguTweaks and pfUI
 Aero:RegisterAddon("ShaguTweaks", "AdvancedSettingsGUI")
+
+local function updateMapScaleAndAlpha()
+    delayRun(0, function()
+        WorldMapFrame.aero.origScale = WorldMapFrame:GetScale()
+
+        local origOnMouseWheel = WorldMapFrame:GetScript("OnMouseWheel")
+        WorldMapFrame:SetScript("OnMouseWheel", function()
+            if origOnMouseWheel then origOnMouseWheel() end
+            if IsShiftKeyDown() then WorldMapFrame.aero.origAlpha = WorldMapFrame:GetAlpha() end
+            if IsControlKeyDown() then WorldMapFrame.aero.origScale = WorldMapFrame:GetScale() end
+        end)
+    end)
+end
 
 local addons = CreateFrame("Frame")
 addons:RegisterEvent("PLAYER_ENTERING_WORLD")
 addons:SetScript("OnEvent", function()
     if IsAddOnLoaded("ShaguTweaks") then
-        if ShaguTweaks_config[ShaguTweaks.T["WorldMap Window"]] == 1 then
-            if WORLDMAP_WINDOWED == 1 then
-                WorldMapFrame_Minimize()
-                delayRun(0, function()
-                    WorldMapFrame:SetWidth(720)
-                    WorldMapFrame:SetHeight(521)
-                end)
-            end
-
-            delayRun(0, function() WorldMapFrame.aero.origScale = WorldMapFrame:GetScale() end)
+        if ShaguTweaks_config[ShaguTweaks.T["WorldMap Window"]] == 1 and WORLDMAP_WINDOWED == 1 then
+            WorldMapFrame_Minimize()
+            delayRun(0, function()
+                WorldMapFrame:SetWidth(720)
+                WorldMapFrame:SetHeight(521)
+            end)
         end
+        updateMapScaleAndAlpha()
     end
 
-    -- pfUI
     if IsAddOnLoaded("pfUI") then
         Aero:RegisterAddon("pfUI", "pfConfigGUI", "pfAddons")
 
@@ -257,6 +266,7 @@ addons:SetScript("OnEvent", function()
                 pfConfigGUI.aero.animating = false
             end)
         end
+        updateMapScaleAndAlpha()
     end
 
     addons:UnregisterEvent("PLAYER_ENTERING_WORLD")

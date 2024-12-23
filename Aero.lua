@@ -76,7 +76,7 @@ Aero:SetScript("OnUpdate", function()
             scale = scale <= 0 and 0.01 or scale
 
             local scalePct = scale / aero.origScale
-            local alpha = (scalePct <= 0.3) and 0 or math.min(1, ((scalePct - 0.3) / 0.7) ^ 4)
+            local alpha = (scalePct <= 0.3) and 0 or math.min(aero.origAlpha, ((scalePct - 0.3) / 0.7) ^ 4)
 
             frame:SetAlpha(alpha)
             frame:SetScale(scale)

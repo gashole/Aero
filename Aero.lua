@@ -27,7 +27,6 @@ end)
 
 local function onShow(frame)
     local aero = frame.aero
-    if aero.animating or StaticPopup1:IsShown() then return end
     aero.animating = true
 
     tinsert(animating, frame)
@@ -39,7 +38,6 @@ Aero:SetScript("OnShow", onShow)
 
 local function onHide(frame)
     local aero = frame.aero
-    if aero.animating or StaticPopup1:IsShown() then return end
     aero.animating = true
 
     tinsert(animating, frame)
@@ -99,13 +97,17 @@ function Aero:RegisterFrames(...)
 
             local origOnShow = frame:GetScript("OnShow")
             frame:SetScript("OnShow", function()
+                if frame.aero.animating then return end
                 if origOnShow then origOnShow(frame) end
+                if StaticPopup1:IsShown() then return end
                 onShow(frame)
             end)
 
             local origOnHide = frame:GetScript("OnHide")
             frame:SetScript("OnHide", function()
+                if frame.aero.animating then return end
                 if origOnHide then origOnHide(frame) end
+                if StaticPopup1:IsShown() then return end
                 onHide(frame)
             end)
         else

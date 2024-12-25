@@ -99,7 +99,6 @@ function Aero:RegisterFrames(...)
             frame:SetScript("OnShow", function()
                 if frame.aero.animating then return end
                 if origOnShow then origOnShow(frame) end
-                if StaticPopup1:IsShown() then return end
                 onShow(frame)
             end)
 
@@ -107,7 +106,6 @@ function Aero:RegisterFrames(...)
             frame:SetScript("OnHide", function()
                 if frame.aero.animating then return end
                 if origOnHide then origOnHide(frame) end
-                if StaticPopup1:IsShown() then return end
                 onHide(frame)
             end)
         else

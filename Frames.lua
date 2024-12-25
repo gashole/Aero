@@ -257,15 +257,6 @@ addons:SetScript("OnEvent", function()
 
     if IsAddOnLoaded("pfUI") then
         Aero:RegisterAddon("pfUI", "pfConfigGUI", "pfAddons")
-
-        for _, frame in pairs({ pfUI.unlock, pfUI.hoverbind }) do
-            local origOnShow = frame:GetScript("OnShow")
-            frame:SetScript("OnShow", function()
-                pfConfigGUI.aero.animating = true
-                if origOnShow then origOnShow() end
-                pfConfigGUI.aero.animating = false
-            end)
-        end
         updateMapScaleAndAlpha()
     end
 

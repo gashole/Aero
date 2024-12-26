@@ -88,9 +88,10 @@ function Aero:RegisterFrames(...)
 
         if type(currentArg) == "string" then
             local frame = _G[currentArg]
-            if not frame then return end
+            if not frame or (frame.aero and frame.aero.registered) then return end
 
             frame.aero = frame.aero or {}
+            frame.aero.registered = true
             frame.aero.elapsed = 0
             frame.aero.origScale = frame:GetScale()
             frame.aero.origAlpha = frame:GetAlpha()

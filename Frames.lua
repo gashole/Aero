@@ -240,9 +240,9 @@ local function updateMapScaleAndAlpha()
     end)
 end
 
-local addons = CreateFrame("Frame")
-addons:RegisterEvent("PLAYER_ENTERING_WORLD")
-addons:SetScript("OnEvent", function()
+local shagu = CreateFrame("Frame")
+shagu:RegisterEvent("PLAYER_ENTERING_WORLD")
+shagu:SetScript("OnEvent", function()
     if IsAddOnLoaded("ShaguTweaks") then
         if ShaguTweaks_config[ShaguTweaks.T["WorldMap Window"]] == 1 and WORLDMAP_WINDOWED == 1 then
             WorldMapFrame_Minimize()
@@ -259,6 +259,6 @@ addons:SetScript("OnEvent", function()
         updateMapScaleAndAlpha()
     end
 
-    addons:UnregisterEvent("PLAYER_ENTERING_WORLD")
-    addons:SetScript("OnEvent", nil)
+    shagu:UnregisterEvent("PLAYER_ENTERING_WORLD")
+    shagu:SetScript("OnEvent", nil)
 end)

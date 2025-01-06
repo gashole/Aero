@@ -103,6 +103,45 @@ for i = 1, NUM_CONTAINER_FRAMES do
     Aero:RegisterFrames("ContainerFrame" .. i)
 end
 
+local function updateChecked(buttonID)
+    local translatedID = 0
+    if buttonID ~= 0 then translatedID = buttonID - CharacterBag0Slot:GetID() + 1 end
+
+    local isVisible = 0
+    for i = 1, NUM_CONTAINER_FRAMES do
+        local frame = _G["ContainerFrame" .. i]
+        if frame:GetID() == translatedID and frame:IsVisible() and not frame.aero.finished then
+            isVisible = 1
+            break
+        end
+    end
+    this:SetChecked(isVisible)
+end
+
+local origBagSlotButton_OnClick = BagSlotButton_OnClick
+function BagSlotButton_OnClick()
+    origBagSlotButton_OnClick()
+    updateChecked(this:GetID())
+end
+
+local origBagSlotButton_OnDrag = BagSlotButton_OnDrag
+function BagSlotButton_OnDrag()
+    origBagSlotButton_OnDrag()
+    updateChecked(this:GetID())
+end
+
+local origBagSlotButton_OnShiftClick = BagSlotButton_OnShiftClick
+function BagSlotButton_OnShiftClick()
+    origBagSlotButton_OnShiftClick()
+    updateChecked(this:GetID())
+end
+
+local origBackpackButton_OnClick = BackpackButton_OnClick
+function BackpackButton_OnClick()
+    origBackpackButton_OnClick()
+    updateChecked(0)
+end
+
 local origUpdateContainerFrameAnchors = updateContainerFrameAnchors
 function updateContainerFrameAnchors() delayRun(0, origUpdateContainerFrameAnchors) end
 

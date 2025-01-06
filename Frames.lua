@@ -155,12 +155,11 @@ function ContainerFrameItemButton_OnEnter(button)
 end
 
 -- World map
+Aero:RegisterFrames("WorldMapFrame")
 local mapFrame = CreateFrame("Frame", nil, WorldMapFrame)
 mapFrame:SetAllPoints(WorldMapFrame)
 mapFrame:RegisterEvent("PLAYER_ENTERING_WORLD")
 mapFrame:SetScript("OnEvent", function()
-    Aero:RegisterFrames("WorldMapFrame")
-
     if WORLDMAP_WINDOWED == 0 then moveFrame(WorldMapFrameTitle, "CENTER", 0, 372) end
 end)
 

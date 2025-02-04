@@ -224,6 +224,7 @@ function WorldMapFrame_Minimize()
     WorldMapFrame.aero.animating = true
     origWorldMapFrame_Minimize()
     WorldMapFrame.aero.animating = false
+    WorldMapFrame.aero.origScale = WorldMapFrame:GetScale()
 end
 
 local origWorldMapFrame_Maximize = WorldMapFrame_Maximize
@@ -237,6 +238,7 @@ function WorldMapFrame_Maximize()
     WorldMapFrame.aero.animating = true
     origWorldMapFrame_Maximize()
     WorldMapFrame.aero.animating = false
+    WorldMapFrame.aero.origScale = WorldMapFrame:GetScale()
 
     moveFrame(WorldMapFrameTitle, "CENTER", 0, 372)
 end

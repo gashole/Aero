@@ -265,10 +265,17 @@ Aero:RegisterAddon("Blizzard_BattlefieldMinimap", "BattlefieldMinimap")
 Aero:RegisterAddon("Blizzard_ItemSocketingUI", "ItemSocketingFrame")
 Aero:RegisterAddon("TimeManager", "TimeManagerFrame")
 
--- ShaguTweaks and pfUI
-Aero:RegisterAddon("ShaguTweaks", "AdvancedSettingsGUI")
+-- ShaguTweaks, Turtle Dragonflight and pfUI
 
-local function updateMapScaleAndAlpha()
+local function fixMinimizeMap()
+    WorldMapFrame_Minimize()
+    delayRun(0, function()
+        WorldMapFrame:SetWidth(720)
+        WorldMapFrame:SetHeight(521)
+    end)
+end
+
+local function handleMapScaleAndAlpha()
     delayRun(0, function()
         WorldMapFrame.aero.origScale = WorldMapFrame:GetScale()
 
@@ -281,25 +288,33 @@ local function updateMapScaleAndAlpha()
     end)
 end
 
-local shagu = CreateFrame("Frame")
-shagu:RegisterEvent("PLAYER_ENTERING_WORLD")
-shagu:SetScript("OnEvent", function()
-    if IsAddOnLoaded("ShaguTweaks") then
-        if ShaguTweaks_config[ShaguTweaks.T["WorldMap Window"]] == 1 and WORLDMAP_WINDOWED == 1 then
-            WorldMapFrame_Minimize()
-            delayRun(0, function()
-                WorldMapFrame:SetWidth(720)
-                WorldMapFrame:SetHeight(521)
-            end)
+local addonFrame = CreateFrame("Frame")
+addonFrame:RegisterEvent("PLAYER_ENTERING_WORLD")
+addonFrame:SetScript("OnEvent", function()
+    for _, addon in ipairs({ "ShaguTweaks", "Turtle-Dragonflight" }) do
+        if IsAddOnLoaded(addon) then
+            Aero:RegisterAddon(addon, "AdvancedSettingsGUI")
+
+            local config, T
+
+            if addon == "ShaguTweaks" then
+                config, T = ShaguTweaks_config, ShaguTweaks.T
+            else
+                config, T = tDFUI_config, tDFUI.T
+
+                if config[T["Improved Interface Options"]] == 1 then UIOptionsFrame.aero.origScale = 0.8 end
+            end
+
+            if config[T["WorldMap Window"]] == 1 and WORLDMAP_WINDOWED == 1 then fixMinimizeMap() end
+
+            handleMapScaleAndAlpha()
         end
-        updateMapScaleAndAlpha()
     end
 
     if IsAddOnLoaded("pfUI") then
         Aero:RegisterAddon("pfUI", "pfConfigGUI", "pfAddons")
-        updateMapScaleAndAlpha()
+        handleMapScaleAndAlpha()
     end
 
-    shagu:UnregisterEvent("PLAYER_ENTERING_WORLD")
-    shagu:SetScript("OnEvent", nil)
+    addonFrame:UnregisterEvent("PLAYER_ENTERING_WORLD")
 end)

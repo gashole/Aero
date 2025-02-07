@@ -265,7 +265,7 @@ Aero:RegisterAddon("Blizzard_BattlefieldMinimap", "BattlefieldMinimap")
 Aero:RegisterAddon("Blizzard_ItemSocketingUI", "ItemSocketingFrame")
 Aero:RegisterAddon("TimeManager", "TimeManagerFrame")
 
--- ShaguTweaks, Turtle Dragonflight and pfUI
+-- ShaguTweaks, Turtle Dragonflight, and pfUI
 
 local function fixMinimizeMap()
     WorldMapFrame_Minimize()
@@ -293,7 +293,7 @@ addonFrame:RegisterEvent("PLAYER_ENTERING_WORLD")
 addonFrame:SetScript("OnEvent", function()
     for _, addon in ipairs({ "ShaguTweaks", "Turtle-Dragonflight" }) do
         if IsAddOnLoaded(addon) then
-            Aero:RegisterAddon(addon, "AdvancedSettingsGUI")
+            Aero:RegisterFrames("AdvancedSettingsGUI")
 
             local config, T
 
@@ -308,11 +308,12 @@ addonFrame:SetScript("OnEvent", function()
             if config[T["WorldMap Window"]] == 1 and WORLDMAP_WINDOWED == 1 then fixMinimizeMap() end
 
             handleMapScaleAndAlpha()
+            break
         end
     end
 
     if IsAddOnLoaded("pfUI") then
-        Aero:RegisterAddon("pfUI", "pfConfigGUI", "pfAddons")
+        Aero:RegisterFrames("pfConfigGUI", "pfAddons")
         handleMapScaleAndAlpha()
     end
 

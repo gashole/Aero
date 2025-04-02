@@ -17,35 +17,29 @@ Aero:SetScript("OnEvent", function()
         AeroDB = AeroDB or {}
         AeroDB.duration = AeroDB.duration or defaultDuration
         duration = AeroDB.duration
-    elseif event == "ADDON_LOADED" then
-        if addons[arg1] then
-            Aero:RegisterFrames(unpack(addons[arg1]))
-            addons[arg1] = nil
-        end
+    elseif event == "ADDON_LOADED" and addons[arg1] then
+        Aero:RegisterFrames(unpack(addons[arg1]))
+        addons[arg1] = nil
     end
 end)
 
 local function onShow(frame)
     local aero = frame.aero
     aero.animating = true
-
-    tinsert(animating, frame)
-
     aero.scaleDiff = 0.6
     aero.startScale = aero.origScale - aero.scaleDiff
+    aero.finished = false
+    table.insert(animating, frame)
 end
 Aero:SetScript("OnShow", onShow)
 
 local function onHide(frame)
     local aero = frame.aero
     aero.animating = true
-
-    tinsert(animating, frame)
-
-    aero.startScale = aero.origScale
     aero.scaleDiff = -0.6
+    aero.startScale = aero.origScale
     aero.finished = true
-
+    table.insert(animating, frame)
     frame:Show()
 end
 Aero:SetScript("OnHide", onHide)
@@ -69,12 +63,12 @@ Aero:SetScript("OnUpdate", function()
 
             aero.animating = false
         else
-            local progress = aero.elapsed / duration
-            local scale = aero.startScale + aero.scaleDiff * progress
-            scale = scale <= 0 and 0.01 or scale
+            local scale = math.max(aero.startScale + aero.scaleDiff * (aero.elapsed / duration), 0.01)
+            local alpha = 0
 
-            local scalePct = scale / aero.origScale
-            local alpha = (scalePct <= 0.3) and 0 or math.min(aero.origAlpha, ((scalePct - 0.3) / 0.7) ^ 4)
+            if (scale / aero.origScale) > 0.3 then
+                alpha = math.min(aero.origAlpha, (((scale / aero.origScale) - 0.3) / 0.7) ^ 4)
+            end
 
             frame:SetAlpha(alpha)
             frame:SetScale(scale)
@@ -85,32 +79,37 @@ end)
 function Aero:RegisterFrames(...)
     for i = 1, arg.n do
         local currentArg = arg[i]
+        if type(currentArg) ~= "string" then return currentArg() end
 
-        if type(currentArg) == "string" then
-            local frame = _G[currentArg]
-            if not frame or (frame.aero and frame.aero.registered) then return end
+        local frame = _G[currentArg]
+        if not frame or (frame.aero and frame.aero.registered) then return end
 
-            frame.aero = frame.aero or {}
-            frame.aero.registered = true
-            frame.aero.elapsed = 0
-            frame.aero.origScale = frame:GetScale()
-            frame.aero.origAlpha = frame:GetAlpha()
+        frame.aero = frame.aero or {}
+        local aero = frame.aero
 
-            local origOnShow = frame:GetScript("OnShow")
-            frame:SetScript("OnShow", function()
-                if frame.aero.animating then return end
-                if origOnShow then origOnShow(frame) end
-                onShow(frame)
+        aero.registered = true
+        aero.elapsed = 0
+        aero.origScale = frame:GetScale()
+        aero.origAlpha = frame:GetAlpha()
+
+        for _, script in pairs({ "OnShow", "OnHide" }) do
+            local origScript = frame:GetScript(script)
+            local func = (script == "OnHide") and onHide or onShow
+
+            frame:SetScript(script, function()
+                if aero.animating then return end
+                if origScript then origScript() end
+                func(frame)
             end)
+        end
 
-            local origOnHide = frame:GetScript("OnHide")
-            frame:SetScript("OnHide", function()
-                if frame.aero.animating then return end
-                if origOnHide then origOnHide(frame) end
-                onHide(frame)
-            end)
-        else
-            currentArg()
+        for _, func in pairs({ "IsShown", "IsVisible" }) do
+            local origFunc = frame[func]
+
+            frame[func] = function()
+                if aero.animating and aero.finished then return false end
+                return origFunc(frame)
+            end
         end
     end
 end
@@ -125,7 +124,7 @@ function Aero:RegisterAddon(addon, ...)
         if enabled then
             addons[addon] = {}
             for i = 1, arg.n do
-                tinsert(addons[addon], arg[i])
+                table.insert(addons[addon], arg[i])
             end
         end
     end

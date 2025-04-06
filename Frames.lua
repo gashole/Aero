@@ -282,8 +282,8 @@ local function handleMapScaleAndAlpha()
         local origOnMouseWheel = WorldMapFrame:GetScript("OnMouseWheel")
         WorldMapFrame:SetScript("OnMouseWheel", function()
             if origOnMouseWheel then origOnMouseWheel() end
-            if IsShiftKeyDown() then WorldMapFrame.aero.origAlpha = WorldMapFrame:GetAlpha() end
             if IsControlKeyDown() then WorldMapFrame.aero.origScale = WorldMapFrame:GetScale() end
+            if IsShiftKeyDown() then WorldMapFrame.aero.origAlpha = WorldMapFrame:GetAlpha() end
         end)
     end)
 end
@@ -314,6 +314,10 @@ addonFrame:SetScript("OnEvent", function()
 
     if IsAddOnLoaded("pfUI") then
         Aero:RegisterFrames("pfConfigGUI", "pfAddons")
+
+        BankFrame.aero.origScale = BankFrame:GetScale()
+        BankFrame.aero.origAlpha = BankFrame:GetAlpha()
+
         handleMapScaleAndAlpha()
     end
 

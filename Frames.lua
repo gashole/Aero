@@ -215,6 +215,8 @@ WorldMapFrameAreaLabel:SetText("")
 -- Turtle WoW
 Aero:RegisterFrames("LFTFrame", "ShopFrame")
 
+function WorldMapFrame_SetMapName() end
+
 local origWorldMapFrame_Minimize = WorldMapFrame_Minimize
 function WorldMapFrame_Minimize()
     WorldMapContinentDropDown:Hide()

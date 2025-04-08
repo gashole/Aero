@@ -293,7 +293,7 @@ end
 local addonFrame = CreateFrame("Frame")
 addonFrame:RegisterEvent("PLAYER_ENTERING_WORLD")
 addonFrame:SetScript("OnEvent", function()
-    for _, addon in ipairs({ "ShaguTweaks", "Turtle-Dragonflight" }) do
+    for _, addon in pairs({ "ShaguTweaks", "Turtle-Dragonflight" }) do
         if IsAddOnLoaded(addon) then
             Aero:RegisterFrames("AdvancedSettingsGUI")
 
@@ -319,6 +319,8 @@ addonFrame:SetScript("OnEvent", function()
 
         BankFrame.aero.origScale = BankFrame:GetScale()
         BankFrame.aero.origAlpha = BankFrame:GetAlpha()
+
+        if WORLDMAP_WINDOWED == 1 then origWorldMapFrame_Maximize() end
 
         handleMapScaleAndAlpha()
     end

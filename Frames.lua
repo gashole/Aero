@@ -57,17 +57,18 @@ local function delayHideOnEvent(frame, eventName, delay)
 
     frame:SetScript("OnEvent", function()
         if event == eventName then
-            frame.aero.delayEvent = false
+            frame.aero.paused = true
 
             delayRun(delay, function()
-                if not frame.aero.delayEvent then
+                if frame.aero.paused then
                     if origOnEvent then origOnEvent() end
+                    frame.aero.paused = false
                     HideUIPanel(frame)
                 end
             end)
         else
-            frame.aero.delayEvent = true
-            origOnEvent()
+            if origOnEvent then origOnEvent() end
+            frame.aero.paused = false
         end
     end)
 end
@@ -79,6 +80,13 @@ end
 
 -- Quest, gossip, and merchant frames
 registerFrameAndDelayEvent("QuestFrame", "QUEST_FINISHED")
+
+local origQuestFrame_OnHide = QuestFrame:GetScript("OnHide")
+QuestFrame:SetScript("OnHide", function()
+    QuestFrame.aero.paused = false
+    if origQuestFrame_OnHide then origQuestFrame_OnHide() end
+end)
+
 registerFrameAndDelayEvent("GossipFrame", "GOSSIP_CLOSED")
 registerFrameAndDelayEvent("MerchantFrame", "MERCHANT_CLOSED")
 
@@ -195,6 +203,7 @@ end
 
 -- World map
 Aero:RegisterFrames("WorldMapFrame")
+
 local mapFrame = CreateFrame("Frame", nil, WorldMapFrame)
 mapFrame:SetAllPoints(WorldMapFrame)
 mapFrame:RegisterEvent("PLAYER_ENTERING_WORLD")

@@ -26,9 +26,9 @@ end)
 local function onShow(frame)
     local aero = frame.aero
     aero.animating = true
+    aero.finished = false
     aero.scaleDiff = 0.6
     aero.startScale = aero.origScale - aero.scaleDiff
-    aero.finished = false
     table.insert(animating, frame)
 end
 Aero:SetScript("OnShow", onShow)
@@ -36,9 +36,9 @@ Aero:SetScript("OnShow", onShow)
 local function onHide(frame)
     local aero = frame.aero
     aero.animating = true
+    aero.finished = true
     aero.scaleDiff = -0.6
     aero.startScale = aero.origScale
-    aero.finished = true
     table.insert(animating, frame)
     frame:Show()
 end
@@ -88,26 +88,31 @@ function Aero:RegisterFrames(...)
         local aero = frame.aero
 
         aero.registered = true
-        aero.elapsed = 0
+        aero.paused = false
+        aero.animating = false
+        aero.finished = false
         aero.origScale = frame:GetScale()
         aero.origAlpha = frame:GetAlpha()
+        aero.startScale = 0
+        aero.scaleDiff = 0
+        aero.elapsed = 0
 
         for _, script in pairs({ "OnShow", "OnHide" }) do
             local origScript = frame:GetScript(script)
             local func = (script == "OnHide") and onHide or onShow
 
             frame:SetScript(script, function()
-                if aero.animating then return end
+                if aero.paused or (aero.animating and aero.elapsed == 0) then return end
                 if origScript then origScript() end
+                if aero.animating then return end
                 func(frame)
             end)
         end
 
         for _, func in pairs({ "IsShown", "IsVisible" }) do
             local origFunc = frame[func]
-
             frame[func] = function()
-                if aero.animating and aero.finished then return false end
+                if aero.finished then return false end
                 return origFunc(frame)
             end
         end

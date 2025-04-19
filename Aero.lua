@@ -88,6 +88,7 @@ function Aero:RegisterFrames(...)
         local aero = frame.aero
 
         aero.registered = true
+        aero.disabled = false
         aero.animating = false
         aero.finished = false
         aero.origScale = frame:GetScale()
@@ -104,7 +105,7 @@ function Aero:RegisterFrames(...)
             frame:SetScript(script, function()
                 if aero.animating and aero.elapsed == 0 then return end
                 if origScript then origScript() end
-                if aero.animating then return end
+                if duration == 0 or aero.disabled or aero.animating then return end
 
                 local currentTime = GetTime()
                 if (currentTime - aero.lastAnim) < duration then return end

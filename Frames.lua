@@ -51,44 +51,23 @@ local function delayRun(delay, callback)
     end)
 end
 
-local function delayHideOnEvent(frame, eventName, delay)
-    delay = delay or 0
-    local origOnEvent = frame:GetScript("OnEvent")
+-- Quest, gossip, and merchant frames
+for _, frameName in pairs({ "QuestFrame", "GossipFrame", "MerchantFrame" }) do
+    Aero:RegisterFrames(frameName)
+
+    local frame = _G[frameName]
+    local aero = frame.aero
+    local origEvent = frame:GetScript("OnEvent")
 
     frame:SetScript("OnEvent", function()
-        if event == eventName then
-            frame.aero.paused = true
-
-            delayRun(delay, function()
-                if frame.aero.paused then
-                    if origOnEvent then origOnEvent() end
-                    frame.aero.paused = false
-                    HideUIPanel(frame)
-                end
-            end)
-        else
-            if origOnEvent then origOnEvent() end
-            frame.aero.paused = false
+        if frame:IsShown() then
+            aero.lastAnim = GetTime()
+            if frame == MerchantFrame then ContainerFrame1.aero.lastAnim = aero.lastAnim end
         end
+
+        if origEvent then origEvent() end
     end)
 end
-
-local function registerFrameAndDelayEvent(frame, eventName, delay)
-    Aero:RegisterFrames(frame)
-    delayHideOnEvent(_G[frame], eventName, delay)
-end
-
--- Quest, gossip, and merchant frames
-registerFrameAndDelayEvent("QuestFrame", "QUEST_FINISHED")
-
-local origQuestFrame_OnHide = QuestFrame:GetScript("OnHide")
-QuestFrame:SetScript("OnHide", function()
-    QuestFrame.aero.paused = false
-    if origQuestFrame_OnHide then origQuestFrame_OnHide() end
-end)
-
-registerFrameAndDelayEvent("GossipFrame", "GOSSIP_CLOSED")
-registerFrameAndDelayEvent("MerchantFrame", "MERCHANT_CLOSED")
 
 -- Spellbook
 Aero:RegisterFrames("SpellBookFrame")

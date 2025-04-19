@@ -88,7 +88,6 @@ function Aero:RegisterFrames(...)
         local aero = frame.aero
 
         aero.registered = true
-        aero.paused = false
         aero.animating = false
         aero.finished = false
         aero.origScale = frame:GetScale()
@@ -96,15 +95,21 @@ function Aero:RegisterFrames(...)
         aero.startScale = 0
         aero.scaleDiff = 0
         aero.elapsed = 0
+        aero.lastAnim = 0
 
         for _, script in pairs({ "OnShow", "OnHide" }) do
             local origScript = frame:GetScript(script)
             local func = (script == "OnHide") and onHide or onShow
 
             frame:SetScript(script, function()
-                if aero.paused or (aero.animating and aero.elapsed == 0) then return end
+                if aero.animating and aero.elapsed == 0 then return end
                 if origScript then origScript() end
                 if aero.animating then return end
+
+                local currentTime = GetTime()
+                if (currentTime - aero.lastAnim) < duration then return end
+                aero.lastAnim = currentTime
+
                 func(frame)
             end)
         end

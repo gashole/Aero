@@ -22,11 +22,15 @@ Aero:RegisterFrames(
     "MailFrame",
     "OpenMailFrame",
     "TradeFrame",
+    "MerchantFrame",
     "CharacterFrame",
+    "SpellBookFrame",
     "BankFrame",
     "PetStableFrame",
     "QuestLogFrame",
+    "QuestFrame",
     "ItemTextFrame",
+    "GossipFrame",
     "FriendsFrame",
     "TaxiFrame",
     "BattlefieldFrame",
@@ -44,7 +48,6 @@ local function delayRun(delay, callback)
 
     frame:SetScript("OnUpdate", function()
         elapsed = elapsed + arg1
-
         if elapsed >= delay then
             callback()
             frame:SetScript("OnUpdate", nil)
@@ -52,38 +55,16 @@ local function delayRun(delay, callback)
     end)
 end
 
--- Quest, gossip, and merchant frames
-for _, frameName in pairs({ "QuestFrame", "GossipFrame", "MerchantFrame" }) do
-    Aero:RegisterFrames(frameName)
-
-    local frame = _G[frameName]
-    local aero = frame.aero
-    local origEvent = frame:GetScript("OnEvent")
-
-    frame:SetScript("OnEvent", function()
-        if frame:IsShown() then
-            aero.lastAnim = GetTime()
-            if frame == MerchantFrame then ContainerFrame1.aero.lastAnim = aero.lastAnim end
-        end
-
-        if origEvent then origEvent() end
-    end)
-end
-
--- Spellbook
-Aero:RegisterFrames("SpellBookFrame")
-
-local origToggleSpellBook = ToggleSpellBook
-function ToggleSpellBook(bookType)
-    this = this or SpellBookFrame
-
-    if SpellBookFrame:IsVisible() and SpellBookFrame.bookType ~= bookType then
-        SpellBookFrame.bookType = bookType
-        SpellBookFrame_Update(1)
+local origShowUIPanel = ShowUIPanel
+function ShowUIPanel(frame, force)
+    if frame and frame.aero and frame.aero.finished then
+        local duration = Aero:GetDuration()
+        frame.aero.elapsed = duration
+        if frame == MerchantFrame and ContainerFrame1.aero then ContainerFrame1.aero.elapsed = duration end
+        delayRun(0, function() origShowUIPanel(frame, force) end)
         return
     end
-
-    origToggleSpellBook(bookType)
+    origShowUIPanel(frame, force)
 end
 
 -- Backpack and bags
@@ -98,7 +79,7 @@ local function updateChecked(buttonID)
     local isVisible = 0
     for i = 1, NUM_CONTAINER_FRAMES do
         local frame = _G["ContainerFrame" .. i]
-        if frame:GetID() == translatedID and frame:IsVisible() and not frame.aero.finished then
+        if frame:GetID() == translatedID and frame:IsVisible() and frame.aero and not frame.aero.finished then
             isVisible = 1
             break
         end
@@ -145,19 +126,19 @@ function OpenAllBags(forceOpen)
 
         if button then
             local bagID = button:GetID() - _G["CharacterBag0Slot"]:GetID() + 1
-
             if i <= NUM_BAG_FRAMES and GetContainerNumSlots(bagID) > 0 then totalBags = totalBags + 1 end
         end
 
         if frame:IsShown() then
-            frame.aero.animating = true
+            if frame.aero then frame.aero.animating = true end
             if frame:GetID() ~= KEYRING_CONTAINER then bagsOpen = bagsOpen + 1 end
         end
     end
 
     if bagsOpen >= totalBags and not forceOpen then
         for i = 1, NUM_CONTAINER_FRAMES do
-            _G["ContainerFrame" .. i].aero.animating = false
+            local frame = _G["ContainerFrame" .. i]
+            if frame.aero then frame.aero.animating = false end
         end
     end
 
@@ -167,9 +148,7 @@ end
 local origToggleBag = ToggleBag
 function ToggleBag(id)
     local frame = _G["ContainerFrame" .. id]
-
-    if frame and frame:IsShown() and frame.aero.animating then frame.aero.animating = false end
-
+    if frame and frame:IsShown() and frame.aero and frame.aero.animating then frame.aero.animating = false end
     origToggleBag(id)
 end
 
@@ -177,7 +156,6 @@ local origContainerFrameItemButton_OnEnter = ContainerFrameItemButton_OnEnter
 function ContainerFrameItemButton_OnEnter(button)
     button = button or this
     if not button:GetRight() then return end
-
     origContainerFrameItemButton_OnEnter(button)
 end
 
@@ -194,7 +172,6 @@ end)
 local origWorldMapButton_OnUpdate = WorldMapButton_OnUpdate
 function WorldMapButton_OnUpdate(elapsed)
     if not this:GetCenter() then return end
-
     origWorldMapButton_OnUpdate(elapsed)
 end
 
@@ -267,6 +244,7 @@ local function fixMinimizeMap()
 end
 
 local function handleMapScaleAndAlpha()
+    if not WorldMapFrame.aero then return end
     delayRun(0, function()
         WorldMapFrame.aero.origScale = WorldMapFrame:GetScale()
 
@@ -292,7 +270,6 @@ addonFrame:SetScript("OnEvent", function()
                 config, T = ShaguTweaks_config, ShaguTweaks.T
             else
                 config, T = tDFUI_config, tDFUI.T
-
                 if config[T["Improved Interface Options"]] == 1 then UIOptionsFrame.aero.origScale = 0.8 end
             end
 

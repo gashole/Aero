@@ -118,7 +118,7 @@ function Aero:RegisterFrames(...)
         for _, func in pairs({ "IsShown", "IsVisible" }) do
             local origFunc = frame[func]
             frame[func] = function()
-                if aero.finished then return false end
+                if aero.finished and aero.elapsed == 0 then return false end
                 return origFunc(frame)
             end
         end
@@ -149,6 +149,8 @@ function Aero:SetDuration(newDuration)
     end
     return false
 end
+
+function Aero:GetDuration() return duration end
 
 SLASH_AERO1 = "/aero"
 SlashCmdList["AERO"] = function(msg)

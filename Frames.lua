@@ -26,6 +26,7 @@ Aero:RegisterFrames(
     "BankFrame",
     "PetStableFrame",
     "QuestLogFrame",
+    "ItemTextFrame",
     "FriendsFrame",
     "TaxiFrame",
     "BattlefieldFrame",

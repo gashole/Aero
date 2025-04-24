@@ -15,8 +15,6 @@ Aero:RegisterFrames(
     "ColorPickerFrame",
     "TabardFrame",
     "StackSplitFrame",
-    "ItemRefTooltip",
-    "GuildInfoFrame",
     "ReputationDetailFrame",
     "HelpFrame",
     "MailFrame",

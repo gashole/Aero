@@ -108,7 +108,7 @@ function Aero:RegisterFrames(...)
                 if duration == 0 or aero.disabled or aero.animating then return end
 
                 local currentTime = GetTime()
-                if (currentTime - aero.lastAnim) < duration then return end
+                if func == onShow and (currentTime - aero.lastAnim) < duration then return end
                 aero.lastAnim = currentTime
 
                 func(frame)

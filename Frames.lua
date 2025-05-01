@@ -69,6 +69,12 @@ function ShowUIPanel(frame, force)
     origShowUIPanel(frame, force)
 end
 
+local origGossipFrameUpdate = GossipFrameUpdate
+function GossipFrameUpdate()
+    if GossipFrame.aero and GossipFrame.aero.finished then ShowUIPanel(GossipFrame) end
+    origGossipFrameUpdate()
+end
+
 -- Backpack and bags
 for i = 1, NUM_CONTAINER_FRAMES do
     Aero:RegisterFrames("ContainerFrame" .. i)

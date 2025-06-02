@@ -75,6 +75,12 @@ function GossipFrameUpdate()
     origGossipFrameUpdate()
 end
 
+local origTaxiNodeOnButtonEnter = TaxiNodeOnButtonEnter
+function TaxiNodeOnButtonEnter(button)
+    if TaxiFrame.aero and TaxiFrame.aero.animating then return end
+    origTaxiNodeOnButtonEnter(button)
+end
+
 -- Backpack and bags
 for i = 1, NUM_CONTAINER_FRAMES do
     Aero:RegisterFrames("ContainerFrame" .. i)

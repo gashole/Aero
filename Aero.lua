@@ -79,47 +79,50 @@ end)
 function Aero:RegisterFrames(...)
     for i = 1, arg.n do
         local currentArg = arg[i]
-        if type(currentArg) ~= "string" then return currentArg() end
 
-        local frame = _G[currentArg]
-        if not frame or (frame.aero and frame.aero.registered) then return end
+        if type(currentArg) ~= "string" then
+            currentArg()
+        else
+            local frame = _G[currentArg]
+            if frame and not (frame.aero and frame.aero.registered) then
+                frame.aero = frame.aero or {}
+                local aero = frame.aero
 
-        frame.aero = frame.aero or {}
-        local aero = frame.aero
+                aero.registered = true
+                aero.disabled = false
+                aero.animating = false
+                aero.finished = false
+                aero.origScale = frame:GetScale()
+                aero.origAlpha = frame:GetAlpha()
+                aero.startScale = 0
+                aero.scaleDiff = 0
+                aero.elapsed = 0
+                aero.lastAnim = 0
 
-        aero.registered = true
-        aero.disabled = false
-        aero.animating = false
-        aero.finished = false
-        aero.origScale = frame:GetScale()
-        aero.origAlpha = frame:GetAlpha()
-        aero.startScale = 0
-        aero.scaleDiff = 0
-        aero.elapsed = 0
-        aero.lastAnim = 0
+                for _, script in pairs({ "OnShow", "OnHide" }) do
+                    local origScript = frame:GetScript(script)
+                    local func = (script == "OnHide") and onHide or onShow
 
-        for _, script in pairs({ "OnShow", "OnHide" }) do
-            local origScript = frame:GetScript(script)
-            local func = (script == "OnHide") and onHide or onShow
+                    frame:SetScript(script, function()
+                        if aero.animating and aero.elapsed == 0 then return end
+                        if origScript then origScript() end
+                        if duration == 0 or aero.disabled or aero.animating then return end
 
-            frame:SetScript(script, function()
-                if aero.animating and aero.elapsed == 0 then return end
-                if origScript then origScript() end
-                if duration == 0 or aero.disabled or aero.animating then return end
+                        local currentTime = GetTime()
+                        if func == onShow and (currentTime - aero.lastAnim) < duration then return end
+                        aero.lastAnim = currentTime
 
-                local currentTime = GetTime()
-                if func == onShow and (currentTime - aero.lastAnim) < duration then return end
-                aero.lastAnim = currentTime
+                        func(frame)
+                    end)
+                end
 
-                func(frame)
-            end)
-        end
-
-        for _, func in pairs({ "IsShown", "IsVisible" }) do
-            local origFunc = frame[func]
-            frame[func] = function()
-                if aero.finished and aero.elapsed == 0 then return false end
-                return origFunc(frame)
+                for _, func in pairs({ "IsShown", "IsVisible" }) do
+                    local origFunc = frame[func]
+                    frame[func] = function()
+                        if aero.finished and aero.elapsed == 0 then return false end
+                        return origFunc(frame)
+                    end
+                end
             end
         end
     end
